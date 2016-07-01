@@ -7,7 +7,7 @@
 # http://iase.disa.mil/pki-pke/Pages/admin.aspx and see "Web Servers"
 # This section built using https://powhatan.iiie.disa.mil/pki-pke/landing_pages/downloads/unclass-rg-public-key-enabling-apache-v2-4_07092015.pdf
 
-sudo apt install dos2unix unzip aria2 build-essential curl git
+sudo apt install dos2unix unzip aria2 build-essential curl git apache2
 
 # useful packages if on a barebones machine:
 sudo apt install man-db vim ufw htop iotop iftop bash-completion unattended-upgrades
@@ -17,7 +17,7 @@ sudo apt install man-db vim ufw htop iotop iftop bash-completion unattended-upgr
 ###############################################################################
 
 # Creeate src folder to keep track of all source files of following steps
-cd
+cd ~/
 mkdir src
 cd src
 
@@ -37,12 +37,14 @@ cd openssl-fips-2.0.12
 make
 sudo make install
 
-cd
+cd ~/
+
 ###############################################################################
 # OpenSSL #
 ###############################################################################
 
 # Navigate to: https://www.openssl.org/source/
+
 cd src
 
 aria2c -x5 https://www.openssl.org/source/openssl-1.0.2h.tar.gz
@@ -59,7 +61,7 @@ cd openssl-1.0.2h
 make depend
 sudo make install
 
-cd
+cd ~/
 
 ###############################################################################
 # DoD Certs #
@@ -82,10 +84,11 @@ openssl smime -verify -in Certificates_PKCS7_v4.1u6_DoD.sha256 -inform DER -CAfi
 # strip the email certs from the ca chain
 cd ~/git
 git clone https://github.com/rarawls/strip_from_certchain.git
-chmod +x strip_from_certchain/strip_from_certchain.py
 
-cd src/Certificates_PKCS7_v4.1u6_DoD
-~/git/strip_from_certchain/strip_from_certchain.py EMAIL DoD_CAs.pem
+cd ~/src/Certificates_PKCS7_v4.1u6_DoD
+python ~/git/strip_from_certchain/strip_from_certchain.py EMAIL DoD_CAs.pem
+
+cd ~/
 
 ###############################################################################
 # DoD Certificate Revocation Lists (CRL)  #
@@ -111,8 +114,14 @@ cd src/Certificates_PKCS7_v4.1u6_DoD
 # TODO: Automate
 # Pick secure protocols - great resources below
 # https://wiki.mozilla.org/Security/Server_Side_TLS
-# https://mozilla.github.io/server-side-tls/ssl-config-generator/
-# https://mozilla.github.io/server-side-tls/ssl-config-generator/?server=apache-2.4.7&openssl=1.0.2h&hsts=yes&profile=modern
+echo "Visit the following URL to obtain an appropriate SSL configuration:"
+echo
+echo " \
+https://mozilla.github.io/server-side-tls/ssl-config-generator/?server=apache-\
+`apache2 -version | grep -o '[0-9]\.[0-9]\.[0-9]'`\
+&openssl=\
+`openssl version | grep -o '[0-9]\.[0-9]\.[0-9][a-z]'`\
+&hsts=yes&profile=modern"
 
 # Now check your config for safety:
 # https://www.ssllabs.com/ssltest/
