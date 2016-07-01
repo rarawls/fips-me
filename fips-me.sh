@@ -7,14 +7,17 @@
 # http://iase.disa.mil/pki-pke/Pages/admin.aspx and see "Web Servers"
 # This section built using https://powhatan.iiie.disa.mil/pki-pke/landing_pages/downloads/unclass-rg-public-key-enabling-apache-v2-4_07092015.pdf
 
-sudo apt-get install dos2unix unzip aria2 build-essential curl
+sudo apt install dos2unix unzip aria2 build-essential curl git
+
+# useful packages if on a barebones machine:
+sudo apt install man-db vim ufw htop iotop iftop bash-completion unattended-upgrades
 
 ###############################################################################
 # FIPS #
 ###############################################################################
 
 # Creeate src folder to keep track of all source files of following steps
-
+cd
 mkdir src
 cd src
 
